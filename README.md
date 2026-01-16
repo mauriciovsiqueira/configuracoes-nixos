@@ -1,2 +1,2 @@
-# Configurações de linux e NixOS
+# Configurações de Linux e NixOS
 Configurações linux e mais com o NixOS.
