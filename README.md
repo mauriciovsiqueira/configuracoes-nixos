@@ -3,21 +3,22 @@ Configurações linux e mais com o NixOS.
 
 ---
 
-## Instalação do NixOS.
-
 *Para aprender a dominar o NixOS, siga este roteiro prático. Ele cobre desde a alteração de uma configuração simples até a atualização de versão do sistema.*
 
-**1. Primeira Atualização Geral**
+## Instalação do NixOS.
+*Faça a instalação normal dele*
+
+**Primeira Atualização Geral**
 *Mesmo que a ISO seja recente, os pacotes mudam rápido. Sincronize o sistema:*
 ```bash
 sudo nix-channel --update
 sudo nixos-rebuild switch --upgrade
 ```
 
-**Passo 2:** O Fluxo de Trabalho Básico (Configurar):
+**O Fluxo de Trabalho Básico (Configurar):**
 *No NixOS, você não instala coisas "soltas". Você as descreve no arquivo central.*
 
-Abra o arquivo: sudo nano /etc/nixos/configuration.nix e copie esse aqui:
+Abra o arquivo: sudo nano /etc/nixos/configuration.nix e copie esse aqui:  
 *Obs.: Esse é minha configuração!!!*
 ```bash
 # Edit this configuration file to define what should be installed on
@@ -193,9 +194,9 @@ Sincronize:
 ```bash
 sudo nixos-rebuild switch
 ```
-*Obs.: Reinicie o pc*
+*Obs.: Reinicie o pc, nesse caso vai ter que fazer essa primeira vez*
 
-**Passo 3:** Manutenção Semanal (Atualizar):
+**Manutenção Semanal (Atualizar):**
 *Faça isso uma vez por semana para manter o sistema seguro e em dia.*
 
 Sincronize e atualize tudo: 
@@ -205,24 +206,43 @@ sudo nixos-rebuild switch --upgrade
 
 *O que isso faz: Baixa as definições novas do canal e já aplica no seu sistema.*
 
-**Passo 4:** Instalar Programas Temporários ou Permanentes:
-*Uma das melhores funções do NixOS para quem está aprendendo.*
+**Habilite o "Não Livre" (Unfree).**
+*Muitos programas (como Google Chrome, Discord, Drivers Nvidia) são proprietários. Para permitir que o NixOS os instale, adicione esta linha fora de qualquer bloco (geralmente no topo ou final do arquivo):*
+nixpkgs.config.allowUnfree = true;
 
-Quer usar o python3 ou o htop só agora?:
+*Obs.: Ele já vai estar habilitado, na instalação normal você vai marcar ela.*
+
+**Instalar Programas Temporários ou Permanentes:**
+*Uma das melhores funções do NixOS para quem está aprendendo.*
+*Caso não tenha feito na config.nix e queira só verificar se o programa está funcionando bem.*
+
+Quer usar o vim ou o htop só agora:
 ```bash
-nix-shell -p python3
+nix-shell -p vim
 ```
 
 *Saia da sessão, o programa não ocupa mais espaço no seu sistema "real".*
+
+Quer instalar permanente no usuário local:
+```bash
+nix-env -iA nixos.vim
+```
+
+Na config.nix (ele fica para todos os usuários):
 
 environment.systemPackages = with pkgs; [
   git
   vlc
   vscode
-  # Adicione o que quiser aqui
+  
+  *Adicione o que quiser aqui*
 ];
 
-**Passo 5:** Limpeza de Disco (Faxina):
+**Drivers de Vídeo (Se tiver placa dedicada).**
+*Na config.nix:*
+Adicione services.xserver.videoDrivers = [ "nvidia" ]; e hardware.opengl.enable = true;.
+
+**Limpeza de Disco (Faxina):**
 *Como o NixOS guarda versões antigas (gerações), o disco pode encher.*
 *Caso não tenha colocado na config.nix*
 
@@ -233,7 +253,17 @@ sudo nix-collect-garbage -d
 
 *Dica: Só faça isso se o sistema atual estiver funcionando perfeitamente, pois isso apaga os pontos de restauração antigos.*
 
-**Passo 6:** Troca de Versão (Upgrade de 6 meses)
+Configure a Limpeza Automática:
+*Para não ter que se preocupar com o disco enchendo com versões antigas, adicione isso ao seu configuration.nix:*
+
+nix.settings.auto-optimise-store = true;
+nix.gc = {
+  automatic = true;
+  dates = "weekly";
+  options = "--delete-older-than 30d";
+};
+
+**Troca de Versão (Upgrade de 6 meses).**
 *Quando sair uma versão nova (ex: mudar da 25.11 para a 26.05).*
 
 Mude o "trilho" (canal): 
@@ -251,7 +281,7 @@ Migre o sistema:
 sudo nixos-rebuild switch --upgrade
 ```
 
-**Passo 7:** O Botão de Pânico (Segurança):
+**O Botão de Pânico (Segurança):**
 *Se você fizer algo errado e o sistema não ligar ou o ambiente gráfico sumir:*
 
 Reinicie o computador.
@@ -280,25 +310,9 @@ O sistema iniciará normalmente.
 
 
 
-*Drivers de Vídeo (Se tiver placa dedicada):*
 
-Nvidia: Adicione services.xserver.videoDrivers = [ "nvidia" ]; e hardware.opengl.enable = true;.
 
-4. Habilite o "Não Livre" (Unfree)
-*Muitos programas (como Google Chrome, Discord, Drivers Nvidia) são proprietários. Para permitir que o NixOS os instale, adicione esta linha fora de qualquer bloco (geralmente no topo ou final do arquivo):*
-nixpkgs.config.allowUnfree = true;
 
-*Obs.: Ele já vai estar habilitado, na instalação normal você vai marcar ela.*
-
-**6. Configure a Limpeza Automática**
-*Para não ter que se preocupar com o disco enchendo com versões antigas, adicione isso ao seu configuration.nix:*
-
-nix.settings.auto-optimise-store = true;
-nix.gc = {
-  automatic = true;
-  dates = "weekly";
-  options = "--delete-older-than 30d";
-};
 
 
 
