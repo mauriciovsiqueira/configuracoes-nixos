@@ -1,5 +1,5 @@
 # Configurações do NixOS e Linux em geral.
-Configurações linux e mais com o NixOS.
+Configurações do NixOS e programas linux.
 
 ---
 
