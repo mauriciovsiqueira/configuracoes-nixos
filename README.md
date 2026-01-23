@@ -8,14 +8,16 @@ Configurações linux e mais com o NixOS.
 ## Configuração do NixOS.
 *Depois de ter feito a instalação do NixOS.*
 
-**Primeira Atualização Geral.**  
+### Primeira Atualização Geral.  
 *Mesmo que a ISO seja recente, os pacotes mudam rápido. Sincronize o sistema:*
 ```bash
 sudo nix-channel --update
 sudo nixos-rebuild switch --upgrade
 ```
 
-**O Fluxo de Trabalho Básico (Configurar).**  
+---
+
+### O Fluxo de Trabalho Básico (Configurar).  
 *No NixOS, você não instala coisas "soltas". Você as descreve no arquivo central.*
 
 Abra o arquivo sudo nano /etc/nixos/configuration.nix e copie esse aqui e cole no seu config.nix:  
@@ -190,28 +192,36 @@ Abra o arquivo sudo nano /etc/nixos/configuration.nix e copie esse aqui e cole n
 } 
 ```
 
-**Sincronize (faça isso sempre que modificar o config.nix):** 
+---
+
+### Sincronize (faça isso sempre que modificar o config.nix): 
 ```bash
 sudo nixos-rebuild switch
 ```
 *Obs.: Reinicie o pc, nesse caso vai ter que fazer essa primeira vez, pois está fazendo depois da instalação e depois não precisa reiniciar de novo quando modificar o arquivo novamente*
 
-**Manutenção Semanal (Atualizar).**  
+---
+
+### Manutenção Semanal (Atualizar).  
 *Faça isso uma vez por semana para manter o sistema seguro e em dia.*
 
-Sincronize e atualize tudo: 
+**Sincronize e atualize tudo:** 
 ```bash
 sudo nixos-rebuild switch --upgrade
 ```
 
 *O que isso faz: Baixa as definições novas do canal e já aplica no seu sistema.*
 
-**Habilite o "Não Livre" (Unfree).**  
+---
+
+### Habilite o "Não Livre" (Unfree).  
 *Muitos programas (como Google Chrome, Discord, Drivers Nvidia) são proprietários. Para permitir que o NixOS os instale, adicione esta linha fora de qualquer bloco (geralmente no topo ou final do arquivo) nixpkgs.config.allowUnfree = true;*
 
 *Obs.: Ele já vai estar habilitado, na instalação normal você vai marcar ela.*
 
-**Instalar Programas Temporários ou Permanentes.**  
+---
+
+### Instalar Programas Temporários ou Permanentes.  
 *Uma das melhores funções do NixOS para quem está aprendendo.*
 *Caso não tenha feito na config.nix e queira só verificar se o programa está funcionando bem.*
 
@@ -222,12 +232,12 @@ nix-shell -p vim
 
 *Saia da sessão, o programa não ocupa mais espaço no seu sistema "real".*
 
-Quer instalar permanente no usuário local:
+**Quer instalar permanente no usuário local:**
 ```bash
 nix-env -iA nixos.vim
 ```
 
-Na config.nix (ele fica para todos os usuários):
+**Na config.nix (ele fica para todos os usuários):**
 ```bash
 environment.systemPackages = with pkgs; [  
   git  
@@ -237,14 +247,18 @@ environment.systemPackages = with pkgs; [
 ];  
 ```
 
-**Drivers de Vídeo (Se tiver placa dedicada).**  
+---
+
+### Drivers de Vídeo (Se tiver placa dedicada).  
 *Na config.nix adicione:*  
 ```bash
 services.xserver.videoDrivers = [ "nvidia" ];
 hardware.opengl.enable = true;.
 ```
 
-**Limpeza de Disco (Faxina).**  
+---
+
+### Limpeza de Disco (Faxina).  
 *Como o NixOS guarda versões antigas (gerações), o disco pode encher.*  
 *Caso não tenha colocado na config.nix*  
 
@@ -255,7 +269,7 @@ sudo nix-collect-garbage -d
 
 *Dica: Só faça isso se o sistema atual estiver funcionando perfeitamente, pois isso apaga os pontos de restauração antigos.*
 
-Configure a Limpeza Automática:
+**Configure a Limpeza Automática:**
 *Para não ter que se preocupar com o disco enchendo com versões antigas, adicione isso ao seu configuration.nix:*
 ```bash
 nix.settings.auto-optimise-store = true;
@@ -266,7 +280,9 @@ nix.gc = {
 };
 ```
 
-**Troca de Versão (Upgrade de 6 meses).**
+---
+
+### Troca de Versão (Upgrade de 6 meses).
 *Quando sair uma versão nova (ex: mudar da 25.11 para a 26.05).*
 
 Mude o "trilho" (canal): 
@@ -283,8 +299,9 @@ Migre o sistema:
 ```bash
 sudo nixos-rebuild switch --upgrade
 ```
+---
 
-**O Botão de Pânico (Segurança).**  
+### O Botão de Pânico (Segurança).  
 *Se você fizer algo errado e o sistema não ligar ou o ambiente gráfico sumir:*  
 Reinicie o computador.
 No menu inicial (Boot), escolha "NixOS - All configurations".
@@ -304,7 +321,9 @@ O sistema iniciará normalmente.
 
 *Parabéns pela instalação! O NixOS recém-instalado é como uma tela em branco. Aqui está o roteiro do que você deve fazer para deixar o sistema pronto para o uso diário:*
 
-**Observaçôes finais.**
+---
+
+### Observaçôes finais.
 
 **Rotina do Usuário (Cronograma).**  
 Toda Semana: Rode sudo nixos-rebuild switch --upgrade para manter segurança e apps em dia.  
