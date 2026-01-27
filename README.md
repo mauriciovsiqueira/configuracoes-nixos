@@ -1,4 +1,4 @@
-# Configurações do NixOS e Linux em geral.
+# Configurações do NixOS.
 Configurações do NixOS e programas linux.
 
 ---
