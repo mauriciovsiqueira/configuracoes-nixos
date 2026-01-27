@@ -20,8 +20,23 @@ sudo nixos-rebuild switch --upgrade
 ### O Fluxo de Trabalho Básico (Configurar).  
 *No NixOS, você não instala coisas "soltas". Você as descreve no arquivo central.*
 
+*Obs.: Não esqueça de mudar o usuário, para não sobreescrever o seu.*  
+*Onde fica:*
+```bash
+# Define a user account. Don't forget to set a password with ‘passwd’.
+  users.users.linux = {
+    isNormalUser = true;
+    description = "linux";
+    extraGroups = [ "networkmanager" "wheel" ];
+    packages = with pkgs; [
+    #  thunderbird
+    ];
+  };
+```
+
+*Obs.: Esse é minha configuração, você pode adaptar para seu uso.*  
+
 Abra o arquivo sudo nano /etc/nixos/configuration.nix e copie esse aqui e cole no seu config.nix:  
-*Obs.: Esse é minha configuração, você pode adaptar para seu uso*
 ```bash
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
@@ -189,7 +204,8 @@ Abra o arquivo sudo nano /etc/nixos/configuration.nix e copie esse aqui e cole n
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.11"; # Did you read the comment?
 
-} 
+}
+
 ```
 
 ---
@@ -198,7 +214,21 @@ Abra o arquivo sudo nano /etc/nixos/configuration.nix e copie esse aqui e cole n
 ```bash
 sudo nixos-rebuild switch
 ```
-*Obs.: Reinicie o pc, nesse caso vai ter que fazer essa primeira vez, pois está fazendo depois da instalação e depois não precisa reiniciar de novo quando modificar o arquivo novamente*
+*Obs.: Reinicie o pc, nesse caso vai ter que fazer essa primeira vez, pois está fazendo depois da instalação e depois não precisa reiniciar de novo quando modificar o arquivo novamente.*
+
+---
+
+### Habilite a Zram:  
+```bash
+    zramSwap = {
+      enable = true;
+      algorithm = "zstd";
+      memoryPercent = 60;
+      priority = 100;
+    };
+```
+
+*Obs.: Para computadores mais fracos e se tiver o swap não tem problema.*
 
 ---
 
@@ -214,8 +244,52 @@ sudo nixos-rebuild switch --upgrade
 
 ---
 
+**Atualização Automática do Sistema.**
+```bash
+system.autoUpgrade = {
+    enable = true;
+    allowReboot = false; # Mantenha false para o PC não reiniciar sozinho
+    dates = "weekly";     # Frequência (pode ser "daily" ou um horário como "03:00")
+    flags = [
+      "--upgrade"
+    ];
+  };
+```
+*Obs.: Coloque o coletor de lixo automático para não aculmular no disco.*  
+
+---
+
+### Limpeza de Disco (Coletor de lixo).  
+*Como o NixOS guarda versões antigas (gerações), o disco pode encher.*  
+*Caso não tenha colocado na config.nix*  
+
+Remova o que é velho: 
+```bash
+sudo nix-collect-garbage -d
+```
+
+*Dica: Só faça isso se o sistema atual estiver funcionando perfeitamente, pois isso apaga os pontos de restauração antigos.*
+
+**Configure a Limpeza Automática:**
+*Para não ter que se preocupar com o disco enchendo com versões antigas, adicione isso ao seu configuration.nix:*
+```bash
+nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d"; # Apaga o que tiver mais de 30 dias
+  };
+
+  # Otimiza o armazenamento (remove ficheiros duplicados)
+  nix.settings.auto-optimise-store = true;
+```
+
+---
+
 ### Habilite o "Não Livre" (Unfree).  
-*Muitos programas (como Google Chrome, Discord, Drivers Nvidia) são proprietários. Para permitir que o NixOS os instale, adicione esta linha fora de qualquer bloco (geralmente no topo ou final do arquivo) nixpkgs.config.allowUnfree = true;*
+*Muitos programas (como Google Chrome, Discord, Drivers Nvidia) são proprietários. Para permitir que o NixOS os instale, adicione esta linha fora de qualquer bloco (geralmente no topo ou final do arquivo). 
+```bash
+nixpkgs.config.allowUnfree = true;
+```
 
 *Obs.: Ele já vai estar habilitado, na instalação normal você vai marcar ela.*
 
@@ -254,30 +328,6 @@ environment.systemPackages = with pkgs; [
 ```bash
 services.xserver.videoDrivers = [ "nvidia" ];
 hardware.opengl.enable = true;.
-```
-
----
-
-### Limpeza de Disco (Faxina).  
-*Como o NixOS guarda versões antigas (gerações), o disco pode encher.*  
-*Caso não tenha colocado na config.nix*  
-
-Remova o que é velho: 
-```bash
-sudo nix-collect-garbage -d
-```
-
-*Dica: Só faça isso se o sistema atual estiver funcionando perfeitamente, pois isso apaga os pontos de restauração antigos.*
-
-**Configure a Limpeza Automática:**
-*Para não ter que se preocupar com o disco enchendo com versões antigas, adicione isso ao seu configuration.nix:*
-```bash
-nix.settings.auto-optimise-store = true;
-nix.gc = {
-  automatic = true;
-  dates = "weekly";
-  options = "--delete-older-than 30d";
-};
 ```
 
 ---
