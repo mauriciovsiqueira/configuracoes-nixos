@@ -162,8 +162,49 @@ environment.systemPackages = with pkgs; [
 *Na config.nix adicione:*  
 ```bash
 services.xserver.videoDrivers = [ "nvidia" ];
-hardware.opengl.enable = true;.
+hardware.opengl.enable = true;
 ```
+
+---
+
+### Adicionar Usuário.  
+*Na config.nix adicione e troque usuario pelo nome:*  
+```bash
+users.users.usuario = {
+  # Se é usuário normal
+  isNormalUser = true;
+  # Define a senha de forma direta e fixa
+  password = "senha_escolhida_aqui"; 
+  
+  # Grupos básicos para uso normal (internet e multimídia)
+  # SEM o grupo "wheel", ele não consegue quebrar o sistema
+  extraGroups = [ "networkmanager" "video" "audio" "lp" ]; # lp é para impressoras
+
+  # Para pacotes para o usuário em expecifico
+  packages = with pkgs; [
+    firefox
+    libreoffice-fresh
+    vlc
+    telegram-desktop
+    spotify
+  ];
+};
+```
+
+*Obs.: Nesse caso é para senha fixa, caso queira colocar a senha no início e usuário trocar (esse é o recomendado):*
+```bash
+# Esta senha serve apenas para o primeiro acesso
+  initialPassword = "senha-temporaria-123";
+```
+
+*O que o usuário deve fazer:*  
+*Assim que o usuário logar pela primeira vez com a senha que você definiu, ele deve abrir o terminal e digitar:*  
+```bash
+passwd
+```
+*Digitar a senha atual: senha-temporaria-123.*
+
+*Digitar a nova senha pessoal dele.*
 
 ---
 
