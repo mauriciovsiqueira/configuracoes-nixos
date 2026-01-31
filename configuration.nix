@@ -95,9 +95,18 @@
   users.users.linux = {
     isNormalUser = true;
     description = "linux";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "video" "audio" "lp" ];
     packages = with pkgs; [
     #  thunderbird
+    ];
+  };
+  
+  # Acesso para esse usuário
+  users.users.rosicley = {
+    isNormalUser = true;
+    password = "0800";
+    extraGroups = [ "networkmanager" "video" "audio" ];
+    packages = with pkgs; [
     ];
   };
 
@@ -121,6 +130,8 @@
     wget
     curl
     git
+  # Som
+    pavucontrol
   # Ajustes gnome
     gnome-tweaks
   # Extensões
@@ -165,4 +176,3 @@
   system.stateVersion = "25.11"; # Did you read the comment?
 
 }
-
